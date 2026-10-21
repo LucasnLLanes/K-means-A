@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe K-Means — Lucas Nahuel Llanes (2026)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purpura:  #5e35b1;
+      --coral:    #ff6f61;
+      --turquesa: #26c6da;
+      --lavanda:  #f3e5f5;
+      --grafito:  #2d2d3a;
+      --gris:     #e0e0e8;
+      --blanco:   #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      margin: 0;
+      background: var(--grafito);
+      color: var(--grafito);
+      line-height: 1.65;
+    }
+    /* ---------- Barra superior ---------- */
+    .topbar {
+      background: var(--purpura);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--blanco);
+    }
+    .topbar img { height: 46px; }
+    .topbar span {
+      font-size: 0.95em;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+    /* ---------- Hero ---------- */
+    .hero {
+      background: linear-gradient(135deg, var(--purpura), var(--turquesa));
+      padding: 80px 40px;
+      text-align: center;
+      color: var(--blanco);
+    }
+    .hero h1 {
+      font-size: 2.3em;
+      margin: 0 0 18px;
+      font-weight: 700;
+    }
+    .hero .meta p {
+      margin: 6px 0;
+      font-size: 1em;
+      opacity: 0.95;
+    }
+    .hero .meta strong { color: #ffe082; }
+    /* ---------- Card principal ---------- */
+    .card {
+      max-width: 880px;
+      margin: -40px auto 60px;
+      background: var(--lavanda);
+      padding: 45px 50px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    h2 {
+      color: var(--purpura);
+      font-size: 1.4em;
+      margin-top: 40px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--coral);
+    }
+    h3 {
+      color: var(--turquesa);
+      font-size: 1.05em;
+      margin-top: 25px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    p { font-size: 1em; }
+    ul { padding-left: 22px; }
+    code {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      background: var(--blanco);
+      color: var(--purpura);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--blanco);
+      color: var(--grafito);
+      padding: 18px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85em;
+      line-height: 1.55;
+      border-left: 5px solid var(--turquesa);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+    /* ---------- Tablas ---------- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: var(--blanco);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.95em;
+    }
+    th {
+      background: var(--purpura);
+      color: var(--blanco);
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--gris); }
+    tr:nth-child(even) td { background: #faf5fc; }
+    /* ---------- Bloques destacados ---------- */
+    .highlight {
+      background: var(--blanco);
+      border-left: 5px solid var(--coral);
+      padding: 18px 22px;
+      border-radius: 8px;
+      margin: 25px 0;
+      font-size: 0.96em;
+      color: var(--grafito);
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+      color: var(--blanco);
+    }
+    .b-purpura { background: var(--purpura); }
+    .b-coral   { background: var(--coral); }
+    .b-turq    { background: var(--turquesa); }
+    /* ---------- Imágenes ---------- */
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 15px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    /* ---------- Footer ---------- */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: #bfbfcc;
+      font-size: 0.85em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra superior -->
+  <div class="topbar">
+    <span>INSTITUTO SUPERIOR DE FORMACIÓN TÉCNICA N° 197</span>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>Clustering de Jurisdicciones Argentinas<br>con K-Means</h1>
+    <div class="meta">
+      <p><strong>Autor:</strong> Lucas Nahuel Llanes</p>
+      <p><strong>Materia:</strong> Aprendizaje Automático</p>
+      <p><strong>Carrera:</strong> Tecnicatura en Ciencia de Datos e IA</p>
+      <p><strong>Año:</strong> 2026</p>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+
+    <h2>1. Resumen</h2>
+    <p>Este documento acompaña al script <code>kmeans_jurisdicciones_llanes.py</code> y al notebook <code>K-Means-Jurisdicciones-Llanes.ipynb</code>. Se aplicó el algoritmo <strong>K-Means</strong> para agrupar las 24 jurisdicciones argentinas según la cantidad de viviendas. El número óptimo de clusters se determinó con el <strong>método del codo</strong>, resultando <code>K = 3</code>.</p>
+
+    <h2>2. Marco conceptual</h2>
+    <p>K-Means es un método de aprendizaje no supervisado que particiona un conjunto de datos en K grupos minimizando la <em>inercia</em>: la suma de distancias al cuadrado entre cada observación y el centroide de su cluster. Cuanto menor es la inercia, más compactos son los grupos.</p>
+    <p>La paleta usada en todo el proyecto es:</p>
+    <table>
+      <tr><th>Rol</th><th>Color</th><th>Hex</th></tr>
+      <tr><td>Primario</td><td><span class="badge b-purpura">Púrpura</span></td><td><code>#5e35b1</code></td></tr>
+      <tr><td>Secundario</td><td><span class="badge b-coral">Coral</span></td><td><code>#ff6f61</code></td></tr>
+      <tr><td>Acento</td><td><span class="badge b-turq">Turquesa</span></td><td><code>#26c6da</code></td></tr>
+    </table>
+
+    <h2>3. Pipeline (idéntico al script)</h2>
+
+    <h3>3.1 Dataset</h3>
+    <p>24 registros con los campos <code>jurisdicción</code> (str) y <code>viviendas</code> (int). Fuente: INDEC — Censo Nacional de Población, Hogares y Viviendas.</p>
+
+    <h3>3.2 Estandarización</h3>
+    <p>Se aplica <code>StandardScaler</code> para neutralizar la magnitud de los valores:</p>
+    <pre><code>X = df[["viviendas"]].values
+escalador = StandardScaler()
+X_esc = escalador.fit_transform(X)</code></pre>
+
+    <h3>3.3 Método del codo</h3>
+    <p>Se calcula la inercia para K entre 1 y 10 y se grafica con la paleta púrpura/coral:</p>
+    <pre><code>inercias = []
+valores_k = range(1, 11)
+
+for k in valores_k:
+    km = KMeans(n_clusters=k, random_state=42)
+    km.fit(X_esc)
+    inercias.append(km.inertia_)
+
+plt.plot(valores_k, inercias,
+         marker="D", color="#5e35b1",
+         linewidth=2.5, markersize=8,
+         markerfacecolor="#ff6f61",
+         markeredgecolor="#2d2d3a")</code></pre>
+
+    <img src="Figure_1.png" alt="Método del Codo">
+
+    <div class="highlight">
+      La curva se aplana a partir de <strong>K = 3</strong>. Ese es el valor seleccionado para el modelo final.
+    </div>
+
+    <h3>3.4 Modelo final</h3>
+    <pre><code>modelo = KMeans(n_clusters=3, random_state=42)
+df["cluster"] = modelo.fit_predict(X_esc)</code></pre>
+
+    <h3>3.5 Visualización</h3>
+    <p>Los tres clusters se pintan con la misma paleta del script:</p>
+    <pre><code>paleta = {0: "#5e35b1", 1: "#ff6f61", 2: "#26c6da"}
+
+plt.scatter(grupo["jurisdicción"], grupo["viviendas"],
+            color=paleta[c], s=90,
+            edgecolor="#2d2d3a", linewidth=0.6)</code></pre>
+
+    <img src="Figure_2.png" alt="Segmentación K-Means">
+
+    <h2>4. Hallazgos</h2>
+
+    <table>
+      <tr><th>Cluster</th><th>Descripción</th><th>Ejemplos</th></tr>
+      <tr>
+        <td><span class="badge b-purpura">0 · púrpura</span></td>
+        <td>Viviendas escasas</td>
+        <td>Catamarca, La Rioja, Santa Cruz</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-coral">1 · coral</span></td>
+        <td>Viviendas intermedias</td>
+        <td>Chaco, Mendoza, Salta</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-turq">2 · turquesa</span></td>
+        <td>Viviendas abundantes</td>
+        <td>Buenos Aires, Córdoba, Santa Fe, CABA</td>
+      </tr>
+    </table>
+
+    <ul>
+      <li><strong>Buenos Aires</strong> aparece como outlier con más de 5.9 millones de viviendas.</li>
+      <li>La diferencia entre el grupo púrpura y el turquesa es de dos órdenes de magnitud.</li>
+      <li>La estandarización evitó que esa diferencia distorsionara los centroides.</li>
+    </ul>
+
+    <h2>5. Cierre y trabajo futuro</h2>
+    <p>El pipeline permitió segmentar el territorio en tres categorías coherentes con la realidad demográfica argentina. Como líneas futuras se propone:</p>
+    <ul>
+      <li>Incorporar <strong>superficie</strong>, <strong>población</strong> e <strong>índice de hacinamiento</strong>.</li>
+      <li>Evaluar el modelo con <strong>índice de silhouette</strong> además del método del codo.</li>
+      <li>Exportar los resultados a un mapa coroplético por provincia.</li>
+    </ul>
+
+    <h2>6. Referencias al código</h2>
+    <table>
+      <tr><th>Archivo</th><th>Contenido</th></tr>
+      <tr><td><code>kmeans_jurisdicciones_llanes.py</code></td><td>Script ejecutable desde consola</td></tr>
+      <tr><td><code>K-Means-Jurisdicciones-Llanes.ipynb</code></td><td>Notebook con celdas explicativas</td></tr>
+      <tr><td><code>Figure_1.png</code></td><td>Método del codo</td></tr>
+      <tr><td><code>Figure_2.png</code></td><td>Scatter de clusters</td></tr>
+    </table>
+
+  </div>
+
+  <div class="footer">
+    Lucas Nahuel Llanes · ISFT N° 197 · 2026
+  </div>
+
+</body>
+</html>
